@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 import os
 
-TOKEN = os.getenv("TOKEN")  # ✅ Railway variable
+TOKEN = os.getenv("MTQ5NjQzMzg1ODg5ODI5Njg3Mg.G2BOE0.TggUkCe2HBlUGiBhe1RB5Mu9DiDJ0HDYiGY_8Y")  # ✅ Railway variable
 CHANNEL_ID = 1496130761932144740
 ROLE_ID = None  # optional role ping
 
