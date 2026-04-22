@@ -1,27 +1,28 @@
 import discord
 from discord import app_commands
+import os
 
-TOKEN = "MTQ5NjQzMzg1ODg5ODI5Njg3Mg.GHAILU.E3Ccl7eEV3UAKssGJrNEk9Ae-fpBSy_CKlYDOU"
+TOKEN = os.getenv("TOKEN")  # ✅ Railway variable
 CHANNEL_ID = 1496130761932144740
-ROLE_ID = None  # put role id if you want ping
+ROLE_ID = None  # optional role ping
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 # =========================
-# 📦 STOCK
+# 📦 STOCK DATA
 # =========================
 current_stock = []
 stock_message = None
 
 # =========================
-# 🎨 PRO EMBED
+# 🎨 EMBED DESIGN (PRO)
 # =========================
 def create_embed():
     embed = discord.Embed(
         title="🟢 BLOX FRUITS DEALER STOCK",
-        description="**Live Dealer Stock • Updates Automatically**",
+        description="**Live Dealer Stock • Updated Manually**",
         color=0x00ff88
     )
 
@@ -33,16 +34,16 @@ def create_embed():
         status = "🟢 AVAILABLE" if item["stock"] else "🔴 OUT OF STOCK"
 
         embed.add_field(
-            name=f"{item['name']}",
+            name=item["name"],
             value=f"💰 **{item['price']}**\n📦 {status}",
             inline=True
         )
 
-    embed.set_footer(text="⏳ Next Update: When dealer refreshes")
+    embed.set_footer(text="⏳ Updates when dealer refreshes")
     return embed
 
 # =========================
-# 🤖 READY
+# 🤖 READY EVENT
 # =========================
 @client.event
 async def on_ready():
@@ -50,14 +51,13 @@ async def on_ready():
     print(f"✅ Logged in as {client.user}")
 
 # =========================
-# 📜 SET STOCK (PRO FORMAT)
+# 📜 SET STOCK (FIXED)
 # =========================
 @tree.command(name="setstock", description="Update full stock")
 async def setstock(interaction: discord.Interaction, data: str):
-    global current_stock, stock_message
+    await interaction.response.defer(ephemeral=True)  # ✅ FIX
 
-    # format:
-    # dragon,3500000,true; dough,2800000,false
+    global current_stock, stock_message
 
     items = data.split(";")
     new_stock = []
@@ -106,7 +106,7 @@ async def setstock(interaction: discord.Interaction, data: str):
     else:
         await stock_message.edit(embed=embed)
 
-    # 🔥 ALERT SYSTEM
+    # 🔥 ALERTS
     for item in current_stock:
         if item["stock"]:
             if "Dragon" in item["name"]:
@@ -116,15 +116,18 @@ async def setstock(interaction: discord.Interaction, data: str):
             if "Dough" in item["name"]:
                 await channel.send("🍩✨ **DOUGH IN STOCK!** ✨🍩")
 
-    await interaction.response.send_message("✅ Stock updated (PRO STYLE)", ephemeral=True)
+    await interaction.followup.send("✅ Stock updated!", ephemeral=True)
 
 # =========================
-# 📜 VIEW STOCK
+# 📜 VIEW STOCK (FIXED)
 # =========================
 @tree.command(name="stock", description="View stock")
 async def stock(interaction: discord.Interaction):
+    await interaction.response.defer()  # ✅ FIX
+
     embed = create_embed()
-    await interaction.response.send_message(embed=embed)
+
+    await interaction.followup.send(embed=embed)
 
 # =========================
 # ▶️ RUN
